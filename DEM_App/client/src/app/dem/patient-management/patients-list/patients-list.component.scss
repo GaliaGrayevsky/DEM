@@ -1,0 +1,20 @@
+.main-container {
+	position: fixed;
+	top: 15vh;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.min-fab {
+	margin-left: 2vw;
+}
+
+mat-card-content {
+	height: 58vh;
+	overflow-y: auto;
+}
+
+mat-list-item {
+	border-bottom: 1px lightgrey solid;
+}

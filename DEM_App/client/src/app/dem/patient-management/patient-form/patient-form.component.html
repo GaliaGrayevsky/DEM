@@ -1,0 +1,52 @@
+<div class="container">
+	<div class="card-wrapper">
+		<mat-card class="mat-elevation-z1">
+			<mat-card-header>
+				<mat-card-title>
+					<h4>{{ title }} patient</h4>
+				</mat-card-title>
+			</mat-card-header>
+			<form [formGroup]="patientForm">
+				<mat-card-content>
+					<div  class="row">
+						Recording language:
+						<mat-form-field>
+							<select matNativeControl formControlName="lang_code">
+								<option *ngFor="let lang of langs" [ngValue]="lang.lang_code">
+									{{ lang.long_name }}
+								</option>
+							</select>						
+						</mat-form-field>
+					</div>
+					<div  class="row">
+						Age: 
+						<mat-slider												
+							[max]="18"
+							[min]="5"
+							[step]="1"
+							[thumbLabel]="true"
+							[tickInterval]="true"
+							formControlName="age">
+						</mat-slider>
+					</div>										
+					<div class="row">
+						Sex:
+						<mat-radio-group formControlName="sex">
+							<mat-radio-button [value] = "sexEnum.MALE">{{ sexEnum.MALE }}</mat-radio-button>
+							<mat-radio-button [value] = "sexEnum.FEMALE">{{ sexEnum.FEMALE }}</mat-radio-button>
+						</mat-radio-group>
+					</div>
+				</mat-card-content>
+				<mat-card-actions>
+					<button (click)="onUpdate($event)"
+					        [disabled]="patientForm.invalid || pending"
+					        color="primary"
+					        mat-raised-button
+					        type="button">{{ action }}
+					</button>					
+				</mat-card-actions>
+			</form>
+			<div *ngIf="error">{{ error }}</div>
+		</mat-card>
+	</div>
+</div>

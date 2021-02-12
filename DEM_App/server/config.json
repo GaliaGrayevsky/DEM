@@ -1,0 +1,7 @@
+{
+  "port": 4301,
+  "jwt": {
+    "secretKey": "DEM application for final project",
+    "expiresIn": "2h"
+  }
+}

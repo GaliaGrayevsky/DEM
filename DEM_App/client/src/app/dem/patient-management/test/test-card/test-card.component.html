@@ -1,0 +1,22 @@
+<div>
+  <h2>Test {{card_type}}</h2>
+  <div class = "flex-container">
+    <div [class] = "(card_type == 'C' ? 'flex-item-hor ' : 'flex-item-vert ') + 'flex-item'" *ngFor="let l of sentence; let i = index">
+      <div [ngStyle] = "{'background': mistakes_marks[i] ? mistakes_marks[i] : '', 
+                          'width': '1vw', 'text-align': 'center'}">
+        {{l=='x' ? '' : l}}    
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<div class="mistakes">
+  <div *ngFor = "let mistake of mistakes">
+    <div>
+      {{mistake}}
+    </div>
+    
+  </div>
+</div>
+

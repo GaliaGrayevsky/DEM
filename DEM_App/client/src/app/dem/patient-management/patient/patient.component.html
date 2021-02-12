@@ -1,0 +1,31 @@
+<div class="main-container">
+	<mat-card>
+		<mat-card-header>
+			<mat-card-title>
+				<h4>Patient ID: {{ currentPatient }}, List of tests:</h4>
+				<button mat-mini-fab matTooltip="Create new tes" (click) = "fireAction(defaultTestForCreate)">
+					<mat-icon aria-label="Create new test">add</mat-icon>
+				</button>
+			</mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<!--<mat-list [@listAnimation]="prepareListState()" [@.disabled]="animationsDisabled">-->
+			<mat-list>
+				<mat-list-item *ngFor="let test of tests; trackBy: trackTest"
+                class="record">
+          <p mat-line>Test Id: {{test.test_id}}</p>
+					<p mat-line>Score: {{test.score | date:'ss'}}</p>
+					<p mat-line>Comments: {{test.comments}}</p>
+					<span>Created at: {{test.updated_at | date:'medium'}}</span>					
+					<button class = "min-fab" mat-mini-fab matTooltip="Open test" (click) = "fireOpenTest(test)">
+						<mat-icon aria-label="Open test">search</mat-icon>
+					</button>
+					<!--<button *ngIf="!readonly" mat-icon-button (click)="deleted.emit(beer);$event.stopImmediatePropagation();">-->
+					<!--<mat-icon>close</mat-icon>-->
+					<!--</button>-->
+				</mat-list-item>
+			</mat-list>
+		</mat-card-content>
+	</mat-card>
+</div>
+

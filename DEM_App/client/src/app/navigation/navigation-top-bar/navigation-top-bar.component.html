@@ -1,0 +1,14 @@
+<mat-toolbar color="primary" class = "mat-elevation-z4">
+  <mat-toolbar-row>
+    <img class = "logo" src="../../../assets/img/logo-removebg-preview.png" alt="">
+    <span>DEM automation tool</span>
+    <span class="spacer"></span>
+    <span class='link' mat-button *ngIf = "isLoggedIn">Logged: {{userName}}!</span>
+
+    <ng-container *ngIf = "!isLoggedIn">
+      <a class='link' mat-button routerLInk = "" (click) = "fireAction('Login')">Login</a>
+      <a class='link' mat-button routerLink = "" (click) = "fireAction('Register')">Register</a>
+    </ng-container>
+    
+  </mat-toolbar-row>
+</mat-toolbar>

@@ -1,0 +1,33 @@
+<div class="main-container">
+	<mat-card>
+		<mat-card-header>
+			<mat-card-title>
+				<h4>My Patients:</h4>
+				<button mat-mini-fab matTooltip="Add new patient" (click) = "fireAction(defaultPatientForCreate)">
+					<mat-icon aria-label="Add new patient">add</mat-icon>
+				</button>
+			</mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<!--<mat-list [@listAnimation]="prepareListState()" [@.disabled]="animationsDisabled">-->
+			<mat-list>
+				<mat-list-item *ngFor="let patient of patients; trackBy: trackPatient"
+								class="record">
+					<p mat-line>Language: {{getLanguageLongNamePatient(patient.lang_code)}}</p>
+					<p mat-line>Age: {{patient.age}}</p>
+					<p mat-line>Sex: {{patient.sex}}</p>
+					<span>Created at: {{patient.updated_at | date:'medium'}}</span>
+					<button class = "min-fab" mat-mini-fab matTooltip="Edit patient profile details" (click) = "fireAction(patient)">
+						<mat-icon aria-label="Edit patient profile details">edit</mat-icon>
+					</button>
+					<button class = "min-fab" mat-mini-fab matTooltip="Open patient card" (click) = "fireOpenPatientCard(patient)">
+						<mat-icon aria-label="Open patient card">search</mat-icon>
+					</button>
+					<!--<button *ngIf="!readonly" mat-icon-button (click)="deleted.emit(beer);$event.stopImmediatePropagation();">-->
+					<!--<mat-icon>close</mat-icon>-->
+					<!--</button>-->
+				</mat-list-item>
+			</mat-list>
+		</mat-card-content>
+	</mat-card>
+</div>

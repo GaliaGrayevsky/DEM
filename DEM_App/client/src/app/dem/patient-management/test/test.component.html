@@ -1,0 +1,59 @@
+<div class="main-container">
+	<div class="sub-types">
+		<div class="left-menu">
+			<div [class] = "'test-type ' + (selectedSubTest == index ? 'active' : '')" *ngFor = "let t of subTestsList; let index = index" 
+				 (click) = "setSelected(index)">	
+				{{testImgMap[index]['test_name']}} : 
+				<mat-icon>{{testImgMap[index]['icon_name']}}</mat-icon> 
+			</div>
+		</div>		
+
+		<div class="top-menu">
+			<button mat-stroked-button color="accent" matTooltip="Upload Audio from file" (click) = "openUploadForm()">
+				Upload
+				<mat-icon aria-label="Upload Audio">audiotrack</mat-icon>
+			</button>
+		
+			<button mat-stroked-button color="accent" matTooltip="Start/Stop chosen test" (click) = "fireRecognition($event)">			
+				{{ !isRecognizing ? 'Start' : 'Stop' }} via Mic
+				<mat-icon [ngClass] = "isRecognizing ? 'pulse-mic' : '' " aria-label="Start recording the test">mic</mat-icon>
+			</button>
+		</div>
+
+		<div *ngIf = 'subTests$' class="main-sec"> 				
+			<p>Additions: {{subTests$[selectedSubTest].additions}}</p> 
+			<p>Deletions: {{subTests$[selectedSubTest].deletions}}</p>
+			<p>Substitutions: {{subTests$[selectedSubTest].substitutions}}</p>
+			<p>Transpositions: {{subTests$[selectedSubTest].transpositions}}</p>
+			<p>Transcript:</p>
+			<p>{{subTests$[selectedSubTest].audio_text}}</p>
+			<p>Test Time: {{subTests$[selectedSubTest].time | date:'ss'}} secs</p>
+		</div>
+
+		
+		
+	</div>
+	<div class="card">
+		<!-- <img [src]="'../../../../assets/img/' + testImgMap[selectedSubTest]['img_name'] + '.png'" alt=""> -->
+		<app-test-card [card_type] = "testImgMap[selectedSubTest]['test_name']" [mistakes] = "subTests$[selectedSubTest]['mistakes_list']"></app-test-card>
+	</div>	
+	
+</div>
+
+<div class="summary">
+	<p class="total mrg5">Total Score: {{totalScore | date:'ss'}}</p> 
+	<mat-form-field class="comment mrg5">
+		<mat-label>Comments:</mat-label>
+		<textarea matInput #message maxlength="512" placeholder="Add any comments you might have" [(ngModel)] = "overall_comment" (input) = "print($event)"> </textarea>
+		<mat-hint align="start"><strong>Don't disclose personal info</strong> </mat-hint>
+		<mat-hint align="end">{{message.value.length}} / 512</mat-hint>
+	</mat-form-field>
+	<button class="calc-btn mrg5" mat-stroked-button color="accent" matTooltip="Calculate and save" (click) = "calculateScore()">
+		Calculate the total score and save results
+	</button>
+</div>
+
+<div class="frame"></div>
+<div class="upload-form" *ngIf = "upload_form_open" >
+	<app-upload-audio-file class="upload-form-comp" (file) = closeUploadForm($event)></app-upload-audio-file>
+</div>

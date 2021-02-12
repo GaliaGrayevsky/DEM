@@ -1,0 +1,10 @@
+<!--<blog-beer-list-container></blog-beer-list-container>-->
+<app-navigation-top-bar 
+    [isLoggedIn] = "isLoggedIn" 
+    [userName] = "userName"
+    (action) = "navigateToAction($event)">
+</app-navigation-top-bar>
+
+<div class="container">
+    <router-outlet></router-outlet>
+</div>
