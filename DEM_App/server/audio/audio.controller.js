@@ -60,7 +60,8 @@ async function uploadAndTranscribeAudio(req, res, next) {
   }
 
 
-  file_name = 'C:/Users/galia/Downloads/DEMApp/DEMApp/DEM_App/server/' + file_name + '_full.wav';
+  file_name = 'D:/DEM/DEM_App/server/Recordings/' + file_name + '_full.wav';
+  console.log('!!!!!!!',file_name);
 
   fs.writeFileSync(file_name, Buffer.from(file_context.replace('data:audio/wav;base64,', ''), 'base64'), function (err) {
     if (err) return console.log(err);
@@ -79,7 +80,7 @@ async function uploadAndTranscribeAudio(req, res, next) {
   const config = {
     encoding: env.SPEECH_ENCODING,
     sampleRateHertz: env.SAMPLE_RATE_HERZ,
-    languageCode: languageCode,
+    languageCode: languageCode
   };
   
 

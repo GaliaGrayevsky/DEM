@@ -85,7 +85,7 @@ io.on('connect', (client) => {
         let filePrevious = fs.createReadStream(path.basename(data.name + '_' + (seq_num-1) + '.wav'));
         
         ffmpeg(filePrevious)
-            .input('C:\\Users\\galia\\Downloads\\DEMApp\\DEMApp\\DEM_App\\server\\' + filenameCurrent)
+            .input('D:\\DEM\\DEM_App\\server\\Recordings\\' + filenameCurrent)
             .on('end', function() {
               console.log('Merging finished !');
               let audioFile = fs.createReadStream(data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
