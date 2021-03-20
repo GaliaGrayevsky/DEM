@@ -18,15 +18,14 @@ const util = require("./util");
 const config = require("./config.json");
 const path = require('path');
 const fs = require('fs');
+const env = require('./env');
 const speech = require('./speech');
 speech.setupSpeech();
 
 var ffmpeg = require('fluent-ffmpeg');
 
-// Create the json-server and provide it our database file so it can create
-// API routes to access our in-memory data.
+// Create the json-server
 const server = jsonServer.create();
-const router = jsonServer.router("./database/mock/db.json");
 
 // Setup express request body parsing.
 server.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
@@ -36,15 +35,11 @@ server.use(jsonServer.defaults());
 // Add a security filter to intercept and inspect requests for valid tokens.
 server.use(authTokenHttpRequestInterceptor.intercept);
 
-// Delay all mock data request.
-//server.use(mockDataHttpRequestInterceptor.intercept);
-
 // API routes.
 server.use("/api/audio", audioController);
 server.use("/api/tests", testsController);
 server.use("/api/patients", patientsController);
 server.use("/api/auth", authController);
-server.use("/api", router);
 
 // Start the server.
 const serverInstance = server.listen(config.port, () => {
@@ -71,8 +66,8 @@ io.on('connect', (client) => {
       
       // get the file name and open writestream
       let seq_num = data.seq_num;
-      let filenameCurrent = path.basename(data.name + '_' + seq_num + '.wav');
-      
+      let filenameCurrent = './' + env.RT_CHUNKS_DIR + '/' + data.name + '_' + seq_num + '.wav';//path.basename();
+      console.log('!!!!! Writing to chunk at:   ' + filenameCurrent);
       let audioFile = fs.createWriteStream(filenameCurrent, {end: false, flags: 'a'});
       
       // get the target language
@@ -82,13 +77,13 @@ io.on('connect', (client) => {
 
       if (seq_num > 0) {
 
-        let filePrevious = fs.createReadStream(path.basename(data.name + '_' + (seq_num-1) + '.wav'));
+        let filePrevious = fs.createReadStream('./' + env.RT_CHUNKS_DIR + '/' + data.name + '_' + (seq_num-1) + '.wav');
         
         ffmpeg(filePrevious)
-            .input('D:\\DEM\\DEM_App\\server\\Recordings\\' + filenameCurrent)
+            .input(filenameCurrent)
             .on('end', function() {
               console.log('Merging finished !');
-              let audioFile = fs.createReadStream(data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
+              let audioFile = fs.createReadStream('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
 
               speech.speechStreamToText(audioFile, targetLang, data.name, seq_num, function(name, seq_num, transcribeObj){
                 console.log('Trascript of: ', (seq_num-1) + '_' + (seq_num) + '.wav', ' :' , {
@@ -106,7 +101,7 @@ io.on('connect', (client) => {
               });
             })
             .on('error', function(e) { console.log('Error!!!!!: ', e);})
-            .mergeToFile(data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
+            .mergeToFile('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
       } 
     });
 });

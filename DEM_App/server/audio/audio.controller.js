@@ -60,7 +60,7 @@ async function uploadAndTranscribeAudio(req, res, next) {
   }
 
 
-  file_name = 'D:/DEM/DEM_App/server/Recordings/' + file_name + '_full.wav';
+  file_name = './' + env.RECORDING_DIR + '/' + file_name + '_full.wav';//'D:/DEM/DEM_App/server/Recordings/' + file_name + '_full.wav';
   console.log('!!!!!!!',file_name);
 
   fs.writeFileSync(file_name, Buffer.from(file_context.replace('data:audio/wav;base64,', ''), 'base64'), function (err) {
@@ -160,87 +160,118 @@ async function combineAndTranscribeRecordedAudio(req, res, next) {
   }
 
   let tmp_file_name = file_name;
-  file_name = 'C:/Users/galia/Downloads/DEMApp/DEMApp/DEM_App/server/' + file_name + '_full.wav';
+  file_name = './' + env.RECORDING_DIR + '/' + file_name + '_full.wav';
 
-  fs.readdirSync('C:/Users/galia/Downloads/DEMApp/DEMApp/DEM_App/server/').
-          sort().          
-          forEach(file => {
-            console.log(file);
-            if ((file.indexOf(tmp_file_name)>=0) && (file.split('_').length == 2) && (file.indexOf('full') == -1)){
-              console.log(file);
-              
-            } else {
+  //let filesList = fs.readdirSync('./' + env.RT_CHUNKS_DIR + '/');   
 
-            }
-          });
+  let filesList = await fs.readdirSync('./' + env.RT_CHUNKS_DIR + '/');
+  
+ 
+  filesList = filesList.map(function (fileName) {
+      return {
+        name: fileName,
+        time: fs.statSync('./' + env.RT_CHUNKS_DIR + '/' + fileName).mtime.getTime()
+      };
+    })
+    .sort(function (a, b) {
+      return a.time - b.time; })
+    .map(function (v) {
+      console.log(v);
+      return v.name; });
+  
 
+  console.log(filesList);
 
-  let file_duration = 0;
-  /** Calculate duration of the file */
-  getAudioDurationInSeconds(file_name).then((duration) => {
-    console.log('Duration of the file: ', duration);
-    file_duration = duration;
+  let index = 0;
+  //let tmpFileName = './' + env.RT_CHUNKS_DIR + '/' + tmp_file_name + index + '_tmp.wav';
+
+  let ffmpegCmd = ffmpeg('./' + env.RT_CHUNKS_DIR + '/' + filesList[0])
+
+  filesList.forEach((e,i) => {
+    if (i>0 && i < filesList.length - 2){
+      ffmpegCmd.input('./' + env.RT_CHUNKS_DIR + '/' + filesList[i]);
+    }
   });
 
-  // Creates a client
-  const client = new speech.v1.SpeechClient();
+  ffmpegCmd.on('end', function() {
+            console.log('Merging finished ! ');
+            /** Remove all temporary stored files */
+            fs.readdirSync('./' + env.RT_COMBINED_CHUNKS + '/').         
+              forEach(file => fs.unlinkSync('./' + env.RT_COMBINED_CHUNKS + '/' + file));
+            fs.readdirSync('./' + env.RT_CHUNKS_DIR + '/').         
+              forEach(file => fs.unlinkSync('./' + env.RT_CHUNKS_DIR + '/' + file));
 
-  const config = {
-    encoding: env.SPEECH_ENCODING,
-    sampleRateHertz: env.SAMPLE_RATE_HERZ,
-    languageCode: languageCode,
-  };
-  
+            let file_duration = 0;
+            /** Calculate duration of the file */
+            getAudioDurationInSeconds(file_name).then((duration) => {
+              console.log('Duration of the file: ', duration);
+              file_duration = duration;
+            });
 
-  /**
-   * Note that transcription is limited to 60 seconds audio.
-   * Use a GCS file for audio longer than 1 minute.
-   */
+            // Creates a client
+            const client = new speech.v1.SpeechClient();
 
-  let test = fs.readFileSync(file_name).toString('base64');
+            const config = {
+              encoding: env.SPEECH_ENCODING,
+              sampleRateHertz: env.SAMPLE_RATE_HERZ,
+              languageCode: languageCode,
+            };
 
-  const audio = {
-    content: test
-  };
 
-  const request = {
-    config: config,
-    audio: audio,
-  };
+            /**
+            * Note that transcription is limited to 60 seconds audio.
+            * Use a GCS file for audio longer than 1 minute.
+            */
 
-  
+            let test = fs.readFileSync(file_name).toString('base64');
 
-  client.longRunningRecognize(request)
-  .then(responses => {
+            const audio = {
+              content: test
+            };
 
-      const [operation, initialApiResponse] = responses;
+            const request = {
+              config: config,
+              audio: audio,
+            };
 
-      // Adding a listener for the "complete" event starts polling for the
-      // completion of the operation.
-      operation.on('complete', (result, metadata, finalApiResponse) => {
-        let transcription = result.results[0].alternatives[0].transcript;
-        console.log('complete: ', transcription);
-        util.createSuccessResponse(res, { 
-                                          transcript: transcription,
-                                          duration: file_duration
-                                        }  
-                                  ); 
-      });
-  
-      // Adding a listener for the "progress" event causes the callback to be
-      // called on any change in metadata when the operation is polled.
-      operation.on('progress', (metadata, apiResponse) => {
-        console.log('progress: ', metadata);
-      });
-  
-      // Adding a listener for the "error" event handles any errors found during polling.
-      operation.on('error', err => {
-         util.createErrorResponse(res, err); 
-         throw(err);
-      });
-  })
-  .catch(err => {
-      console.error("transcript error", err);
-  });
-  
+
+
+            client.longRunningRecognize(request).then(responses => {
+
+              const [operation, initialApiResponse] = responses;
+
+              // Adding a listener for the "complete" event starts polling for the
+              // completion of the operation.
+              operation.on('complete', (result, metadata, finalApiResponse) => {
+              let transcription = result.results[0].alternatives[0].transcript;
+              console.log('complete: ', transcription);
+              util.createSuccessResponse(res, { 
+                                                transcript: transcription,
+                                                duration: file_duration
+                                              }  
+                                        ); 
+            });
+
+            // Adding a listener for the "progress" event causes the callback to be
+            // called on any change in metadata when the operation is polled.
+            operation.on('progress', (metadata, apiResponse) => {
+              console.log('progress: ', metadata);
+            });
+
+            // Adding a listener for the "error" event handles any errors found during polling.
+            operation.on('error', err => {
+                util.createErrorResponse(res, err); 
+                throw(err);
+              });
+            })
+            .catch(err => {
+                console.error("transcript error", err);
+            });
+          })
+        .on('error', function(e) { console.log('Error!!!!!: ', e);})
+        .mergeToFile(file_name);
+
+
+  console.log('After merging!!!!!!!!!!');
+
 }

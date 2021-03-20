@@ -1,6 +1,6 @@
 {
   "name": "DEM",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 1111 --open",
@@ -8,11 +8,9 @@
     "prod": "ng build --prod --build-optimizer",
     "test": "ng test",
     "lint": "ng lint",
-    "lint-fix": "ng lint angular-add-auth-token-ngrx --fix",
+    "lint-fix": "ng lint dem --fix",
     "e2e": "ng e2e",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "dev-auth": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "ng serve --port 1112 --open"
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "private": true,
   "dependencies": {

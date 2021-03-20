@@ -208,6 +208,8 @@ export class TestContainer implements OnInit {
     me.isRecording = true;
     me.ioService.setDefaultLanguage(me.currentLangCode);
 
+    
+
     /**
      * Initialize the current subtest recording
     */
@@ -227,7 +229,7 @@ export class TestContainer implements OnInit {
             sampleRate: 44100, 
             recorderType: recordRTC.StereoAudioRecorder,
             numberOfAudioChannels: 1,
-            timeSlice: 1000,
+            timeSlice: 1500,
             desiredSampRate: 16000,
 
             async ondataavailable(blob) {
@@ -272,7 +274,7 @@ export class TestContainer implements OnInit {
     this.isLoading = true;
 
     /** Combining all chunks into one single file and transcribe it */
-    /* this.fileService.combineAudio( me.currentLangCode, file_name).subscribe(
+    this.fileService.combineAudio( me.currentLangCode, file_name).subscribe(
       transcript => {        
         console.log('Transcript: ', transcript['transcript']);   
         console.log('Duration: ', transcript['duration']);   
@@ -280,20 +282,11 @@ export class TestContainer implements OnInit {
         this.subTests$[this.currentTest].audio_text = me.currentTranscriptTemplate;
         me.distance = me.distanceFnc(me.currentTranscriptTemplate, transcript['transcript']);
         me.duration = transcript['duration'];
-        this.isLoading = false;
         me.updateCurrentTest();
-        this.updateSubTests();
+        this.isLoading = false;
       }
-    ); */
+    );
 
-    this.updateSubTests();
-  }
-
-  private updateSubTests(){
-    this.isLoading = true;
-    this.subTestsService.updateSubTests(this.subTests$).subscribe(data => {
-      this.isLoading = false;
-    });
   }
 
   public toggleRecording(event: recType){
@@ -309,6 +302,8 @@ export class TestContainer implements OnInit {
       this.start_timestamp = new Date();
       this.currentTest = event.selectedTest;
 
+      console.log('Setting template by : ', this.currentTest);
+
       switch (this.currentTest) {
         case 0:
           this.currentTranscriptTemplate = VERTICAL_A_TRANSCRIPT;
@@ -323,6 +318,7 @@ export class TestContainer implements OnInit {
           break;
       }
        
+      console.log('Setting template to : ', this.currentTranscriptTemplate);
     }
 
     
@@ -375,8 +371,14 @@ export class TestContainer implements OnInit {
 
     if (event){
       this.totalScore = this.subTests$[2].time * (80/(80 - this.subTests$[2].deletions + this.subTests$[2].additions));
+      /**
+       * Update all sub tests data once recognition is finished
+       */
       this.subTestsService.updateSubTests(this.subTests$).subscribe(data => {
       
+        /**
+         * Upadate total of the test
+         */
         this.currentTestObj.score = this.totalScore;
         console.log(this.overall_comment);
         this.currentTestObj.comments = event;

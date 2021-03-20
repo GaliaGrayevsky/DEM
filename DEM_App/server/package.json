@@ -1,6 +1,6 @@
 {
   "name": "dem-app-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "npm run dem-app-server-start",
@@ -8,9 +8,6 @@
     "test": "ng test",
     "lint": "ng lint",
     "lint-fix": "ng lint dem-app-server --fix",
-    "dev": "concurrently \"npm run server-auth\" \"npm run client\"",
-    "dev-auth": "concurrently \"npm run server-auth\" \"npm run client\"",
-    "server": "json-server ./db.json --port 4301 --watch",
     "dem-app-server-start": "nodemon ./ --inspect"
   },
   "private": true,

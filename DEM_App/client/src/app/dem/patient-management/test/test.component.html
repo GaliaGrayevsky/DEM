@@ -20,7 +20,7 @@
 			</button>
 		</div>
 
-		<div *ngIf = 'subTests$' class="main-sec"> 				
+		<div *ngIf = 'subTests$ && subTests$.length>0' class="main-sec"> 				
 			<p>Additions: {{subTests$[selectedSubTest].additions}}</p> 
 			<p>Deletions: {{subTests$[selectedSubTest].deletions}}</p>
 			<p>Substitutions: {{subTests$[selectedSubTest].substitutions}}</p>
@@ -33,7 +33,7 @@
 		
 		
 	</div>
-	<div class="card">
+	<div *ngIf = 'subTests$ && subTests$.length>0' class="card">
 		<!-- <img [src]="'../../../../assets/img/' + testImgMap[selectedSubTest]['img_name'] + '.png'" alt=""> -->
 		<app-test-card [card_type] = "testImgMap[selectedSubTest]['test_name']" [mistakes] = "subTests$[selectedSubTest] && subTests$[selectedSubTest]['mistakes_list'] ? subTests$[selectedSubTest]['mistakes_list'] : []"></app-test-card>
 	</div>	

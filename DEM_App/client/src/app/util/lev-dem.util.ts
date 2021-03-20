@@ -22,8 +22,12 @@ export const mapDigits = {
     'too': 2,
     'three': 3,
     'tree': 3,
+    'sweet': 3,
+    'free': 3,
     'four': 4,
     'for': 4,
+    '4 or': 4,
+    'or':4,
     'point':4,
     '\\.': 4,
     'full': 4,
@@ -40,6 +44,7 @@ export const mapDigits = {
     'пять': 5,
     'шесть': 6,
     'семь': 7,
+    'всем': 7,
     'восемь': 8,
     'девять': 9,
     'אחד': 1,
@@ -74,6 +79,11 @@ export function lev_dem_distance (a: string, b:string): Distance{
     let min: Function = Math.min;
 
     /** Translate words into digits */
+
+    // Fix for . //TODO: make it better AI so will not replace full stops for 4 where it is not required
+    if (b.indexOf('.') > -1) {
+        b = b.replace('.', '4');
+    }
 
     for (let key in mapDigits){
         if (b.indexOf(key)>=0){

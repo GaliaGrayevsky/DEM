@@ -6,5 +6,8 @@ module.exports = {
     SINGLE_UTTERANCE: false,
     BASE_LANG: 'en-US',
     SSML_GENDER: 'NEUTRAL',
-    SPEECH_ENCODING: 'LINEAR16'
+    SPEECH_ENCODING: 'LINEAR16',
+    RECORDING_DIR: 'Recordings',
+    RT_CHUNKS_DIR: 'RT_Chunks',
+    RT_COMBINED_CHUNKS: 'RT_Combined_Chunks'
 }
