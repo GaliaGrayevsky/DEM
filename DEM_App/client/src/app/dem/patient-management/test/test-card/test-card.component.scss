@@ -8,17 +8,26 @@
 
 .flex-item-hor {
     width: 10%;
-    padding-bottom: 1.5vh;
+    padding-bottom: 1vh;
 }
 
 .flex-item-vert {
     width: 50%;
-    padding-bottom: 0.5vh;
+    //padding-bottom: 0.5vh;
+}
+
+.flex-color:hover {
+    cursor: pointer;
 }
 
 .mistakes {
     position: fixed;
-    right: 15vw;
+    right: 8vw;
     top: 30vh;
     
+}
+
+.mistakes > div {
+    border: solid 0.1pt lightgrey;
+    padding: 0.7vh;
 }

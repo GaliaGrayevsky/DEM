@@ -15,3 +15,13 @@ Run `npm start` for a dev server. The application will be open automaticaly in y
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+
+## Documentation
+ 
+Documentation is generated with compodoc library. Run "npm run compodoc" to refresh/ generate after first application installation/when application changes. 
+(https://github.com/GaliaGrayevsky/DEM/tree/master/DEM_App/client/documentation)
+
+## General Overview
+
+The application is written with angular framework (7.1.3)
+It uses angular routing for support navigation between the views, Redux pattern (implemented with using NGRx library) and JWT for securing comnications

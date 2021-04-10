@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "lint-fix": "ng lint dem-app-server --fix",
-    "dem-app-server-start": "nodemon ./ --inspect"
+    "dem-app-server-start": "nodemon ./ --inspect-brk",
+    "compodoc": "npx compodoc -p ./src/tsconfig.app.json src"
   },
   "private": true,
   "dependencies": {

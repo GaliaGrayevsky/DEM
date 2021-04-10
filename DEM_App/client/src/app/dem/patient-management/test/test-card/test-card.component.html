@@ -2,8 +2,14 @@
   <h2>Test {{card_type}}</h2>
   <div class = "flex-container">
     <div [class] = "(card_type == 'C' ? 'flex-item-hor ' : 'flex-item-vert ') + 'flex-item'" *ngFor="let l of sentence; let i = index">
-      <div [ngStyle] = "{'background': mistakes_marks[i] ? mistakes_marks[i] : '', 
-                          'width': '1vw', 'text-align': 'center'}">
+      <div class = 'flex-digit' [ngStyle] = "{'background': mistakes_marks[i] ? mistakes_marks[i].color : '', 
+                          'width': '1vw', 'text-align': 'center', 'padding': '0.3vh',
+                          'border-radius': '50%'}"
+            [ngClass] = "mistakes_marks[i] ? 'flex-color' : ''" 
+            [matTooltip] = 'mistakes_marks[i] ? mistakes_marks[i].tooltip : null'
+
+            (mouseover) = "highLight(mistakes_marks[i])"
+            >
         {{l=='x' ? '' : l}}    
       </div>
     </div>
@@ -12,11 +18,8 @@
 </div>
 
 <div class="mistakes">
-  <div *ngFor = "let mistake of mistakes">
-    <div>
-      {{mistake}}
-    </div>
-    
+  <div *ngFor = "let mistake of mistakes" (mouseover) = "highLight(mistake)">
+    {{mistake}}
   </div>
 </div>
 

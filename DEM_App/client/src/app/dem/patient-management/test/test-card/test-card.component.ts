@@ -62,17 +62,17 @@ export class TestCardComponent implements OnInit {
       let tmp = this.mistakes[i];
       switch (tmp[0]) {
         case 'insert': 
-          this.mistakes_marks[this.getIndex(tmp[1], adj)] = COLORS.INSERT;
+          this.mistakes_marks[this.getIndex(tmp[1], adj)] = {color: COLORS.INSERT, tooltip: tmp};
           break;
         case 'replace': 
-          this.mistakes_marks[this.getIndex(tmp[1], adj)] = COLORS.REPLACE;
+          this.mistakes_marks[this.getIndex(tmp[1], adj)] = {color: COLORS.REPLACE, tooltip: tmp};
           break;
         case 'delete': 
-          this.mistakes_marks[this.getIndex(tmp[1], adj)] = COLORS.DELETE;
+          this.mistakes_marks[this.getIndex(tmp[1], adj)] = {color: COLORS.DELETE, tooltip: tmp};
           break;
         case 'transpose': 
-          this.mistakes_marks[this.getIndex(tmp[1], adj)] = COLORS.TRANSPOSE;
-          this.mistakes_marks[this.getIndex(tmp[2], adj)] = COLORS.TRANSPOSE;
+          this.mistakes_marks[this.getIndex(tmp[1], adj)] = {color: COLORS.TRANSPOSE, tooltip: tmp};
+          this.mistakes_marks[this.getIndex(tmp[2], adj)] = {color: COLORS.TRANSPOSE, tooltip: tmp};
           break;
       }
     }
@@ -91,5 +91,9 @@ export class TestCardComponent implements OnInit {
 
     console.log(ind);
     return ind;
+  }
+
+  highLight(event$): void {
+    console.log(event$);
   }
 }

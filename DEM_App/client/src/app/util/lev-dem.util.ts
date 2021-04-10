@@ -66,12 +66,27 @@ export const mapDigits = {
     'תשעה': 9
 }
 
+export function cleanString(a: string): string {
+    for (let key in mapDigits){
+        if (a.indexOf(key)>=0){
+            let re = new RegExp(key,"g");
+            a = a.replace(re,mapDigits[key]);
+        }
+    }
+
+    /** Removing any spaces or not number chars in the transcript */
+    a = a.replace(/\D/g,'');
+
+    return a;
+}
+
+
 /**
  * levenshtein damerau distance algorithm and returns minimal requested 
  * number of opperations needed to convert form source string to target string
  * 
- * @param a string source
- * @param b string target
+ * @param a string source: in the case of this app, it is card text
+ * @param b string target: in the case of this app, it is an transcript
  * 
  */
 export function lev_dem_distance (a: string, b:string): Distance{ 
@@ -156,6 +171,8 @@ export function lev_dem_distance (a: string, b:string): Distance{
                 }
 	let i = a.length;
 	let j = b.length;
+
+    let adjustment_index = 0;
 	
 	while (!(i == 0 && j == 0)) {		
 		
@@ -218,6 +235,21 @@ export function lev_dem_distance (a: string, b:string): Distance{
 		
     console.log(`The distance between ${a} and ${b} is ${+m[a.length][b.length]}`);
     console.log(`Requested operations are: `, ops);
+
+    /* for (let i = ops.length; i--; i>=0){
+        console.log(i, ops[i]);
+        
+        ops[i][1] = ops[i][1] + adjustment_index;
+        ops[i][2] = ops[i][2] + adjustment_index;
+
+        if (ops[i][0] == 'delete') {
+            adjustment_index++;
+        }
+
+        if (ops[i][0] == 'insert') {
+            adjustment_index--;
+        }
+    } */
 
     result['ops'] = ops;
     console.log('Summary: ', result);

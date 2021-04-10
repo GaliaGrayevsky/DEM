@@ -188,8 +188,12 @@ async function combineAndTranscribeRecordedAudio(req, res, next) {
   let ffmpegCmd = ffmpeg('./' + env.RT_CHUNKS_DIR + '/' + filesList[0])
 
   filesList.forEach((e,i) => {
-    if (i>0 && i < filesList.length - 2){
-      ffmpegCmd.input('./' + env.RT_CHUNKS_DIR + '/' + filesList[i]);
+    if (i>0 && i < filesList.length - 1){
+      try {
+        ffmpegCmd.input('./' + env.RT_CHUNKS_DIR + '/' + filesList[i]);
+      } catch (e) {
+        console.log('Bug in input!!!!', filesList[i]);
+      }      
     }
   });
 

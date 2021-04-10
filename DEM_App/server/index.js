@@ -79,29 +79,51 @@ io.on('connect', (client) => {
 
         let filePrevious = fs.createReadStream('./' + env.RT_CHUNKS_DIR + '/' + data.name + '_' + (seq_num-1) + '.wav');
         
-        ffmpeg(filePrevious)
-            .input(filenameCurrent)
-            .on('end', function() {
-              console.log('Merging finished !');
-              let audioFile = fs.createReadStream('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
+        try{
+          ffmpeg(filePrevious)
+          .input(filenameCurrent)
+          .on('end', function() {
+            console.log('Merging finished !');
+            let audioFile = fs.createReadStream('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
 
-              speech.speechStreamToText(audioFile, targetLang, data.name, seq_num, function(name, seq_num, transcribeObj){
-                console.log('Trascript of: ', (seq_num-1) + '_' + (seq_num) + '.wav', ' :' , {
-                                                                                                transcript: transcribeObj ? transcribeObj.transcript.replace(/[^123456789]/g, '') : null,
-                                                                                                seq_num_prev: seq_num-1,
-                                                                                                seq_num_curr: seq_num
-                                                                                              });
-                me.socketClient.emit('transcript', {
-                                                      transcript: transcribeObj ? transcribeObj.transcript.replace(/[^123456789]/g, '') : null,
-                                                      seq_num_prev: seq_num-1,
-                                                      seq_num_curr: seq_num                                                      
-                                                    }
-                                                      
-                                    );
-              });
-            })
-            .on('error', function(e) { console.log('Error!!!!!: ', e);})
-            .mergeToFile('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
+            speech.speechStreamToText(audioFile, targetLang, data.name, seq_num, function(name, seq_num, transcribeObj){
+              console.log('Trascript of: ', (seq_num-1) + '_' + (seq_num) + '.wav', ' :' , {
+                                                                                              transcript: transcribeObj ? transcribeObj.transcript/* .replace(/[^123456789]/g, '') */ : 'אין נתונים',
+                                                                                              seq_num_prev: seq_num-1,
+                                                                                              seq_num_curr: seq_num
+                                                                                            });
+              me.socketClient.emit('transcript', {
+                                                    transcript: transcribeObj ? transcribeObj.transcript/* .replace(/[^123456789]/g, '') */ : 'אין נתונים',
+                                                    seq_num_prev: seq_num-1,
+                                                    seq_num_curr: seq_num                                                      
+                                                  }
+                                                    
+                                  );
+            });
+          })
+          .on('error', function(e) { 
+            console.log('Error!!!!!: ', e);
+            filePrevious.close();
+
+            console.log('Trascript of: ', (seq_num-1) + '_' + (seq_num) + '.wav', ' :' , {
+              transcript:  'אין נתונים',
+              seq_num_prev: seq_num-1,
+              seq_num_curr: seq_num
+            });
+
+            me.socketClient.emit('transcript', {
+                                                  transcript: 'אין נתונים',
+                                                  seq_num_prev: seq_num-1,
+                                                  seq_num_curr: seq_num                                                      
+                                                }
+            );
+          })
+          .mergeToFile('./' + env.RT_COMBINED_CHUNKS + '/' + data.name + '_' + (seq_num-1) + '_' + (seq_num) + '.wav');
+        }
+        catch(err) {
+          console.log('Errors from the socket input !!!!!!!!!!!');
+        }
+        
       } 
     });
 });

@@ -10,7 +10,8 @@
     "lint": "ng lint",
     "lint-fix": "ng lint dem --fix",
     "e2e": "ng e2e",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "compodoc": "npx compodoc -p ./src/tsconfig.app.json src"
   },
   "private": true,
   "dependencies": {

@@ -8,7 +8,7 @@ import { fileType, recType } from './test.component';
 
 import * as recordRTC from 'recordrtc';
 
-import { HORIZONTAL_TRANSCRIPT, VERTICAL_A_TRANSCRIPT, VERTICAL_B_TRANSCRIPT, Distance, lev_dem_distance } from '../../../util/lev-dem.util';
+import { HORIZONTAL_TRANSCRIPT, VERTICAL_A_TRANSCRIPT, VERTICAL_B_TRANSCRIPT, Distance, lev_dem_distance, cleanString } from '../../../util/lev-dem.util';
 import { IoService } from 'src/app/core/service/io.service';
 import { FileService } from "src/app/core/service/file.service";
 import { SubTestsService } from "src/app/core/service/sub-tests.service";
@@ -66,6 +66,7 @@ export class TestContainer implements OnInit {
 
   /** Distance function */
   public distanceFnc = lev_dem_distance;
+  public cleanString = cleanString;
   public distance: Distance;
 
   public isLoading: boolean = false;
@@ -132,12 +133,20 @@ export class TestContainer implements OnInit {
       let i:number = 0;
       let ind: number = 1;
 
-      //transcript = transcript.transcript;
+      /** Clean the transcript string, apply substitution of know words, replace all the rest non digit chars */
+      if (!!transcript.transcript) {
+        transcript.transcript = scope.cleanString(transcript.transcript);
+      }
 
       console.log('Received: ', !transcript.transcript && !scope.transcript_array[transcript.seq_num_prev], transcript.transcript);
+
+      /**  Update the transcript array object (holds all the recived up to now chunks) and then try to construct interim transcript */
       if ((!transcript.transcript && !scope.transcript_array[transcript.seq_num_prev]) || transcript.transcript) {
+
         scope.transcript_array[transcript.seq_num_prev] = transcript.transcript ? transcript.transcript : '';
-        console.log('Set transcript array: ', transcript.seq_num_prev, scope.transcript_array[transcript.seq_num_prev]);
+        console.log('Update transcript array: ', transcript.seq_num_prev, scope.transcript_array[transcript.seq_num_prev]);
+
+        /** special treatment to start */
         if (transcript.seq_num_prev == 0){
           scope.interim_transcript = scope.transcript_array[transcript.seq_num_prev];
           scope.current_seq++;
@@ -145,30 +154,22 @@ export class TestContainer implements OnInit {
         console.log('Set current sequesnce: ', scope.current_seq);
         console.log('Current sequesnce arr value: ', scope.transcript_array[scope.current_seq]);
         
-        while ( scope.transcript_array[scope.current_seq] ) {
-          console.log('1: ', scope.current_seq, scope.transcript_array[scope.current_seq]);
+        /** Combine current transcript string - take maximum continuous sequence of transcripts and join them together*/
+        while ( scope.transcript_array[scope.current_seq]  || (scope.transcript_array[scope.current_seq] == '')) {
+
           if ( scope.transcript_array[scope.current_seq] != '' ) {
-            console.log('2: ', scope.current_seq, scope.transcript_array[scope.current_seq]);
             i = 0;
             while ( i >= 0 && (scope.transcript_array[scope.current_seq].length + 1) >= ind 
                            && ((i == 0) || (i >= (scope.transcript_array[scope.current_seq-1].length - scope.transcript_array[scope.current_seq].length)))) {
-              console.log(scope.transcript_array[scope.current_seq].substring(0, ind));
               i = scope.transcript_array[scope.current_seq - 1].indexOf(scope.transcript_array[scope.current_seq].substring(0, ind++));
             }
-            console.log('3: ', scope.current_seq, scope.transcript_array[scope.current_seq], i, ind);
             scope.interim_transcript = scope.interim_transcript + scope.transcript_array[scope.current_seq].substring(ind-2, scope.transcript_array[scope.current_seq].length+1);
-            console.log('4: ', scope.interim_transcript);
           }
 
           scope.current_seq++;
         }
-  
-        
-        /* if (scope.interim_transcript.length - scope.interim_transcript.indexOf(transcript.substr(0, --ind)) == ind){
-          transcript = transcript.substr(ind, transcript.length);
-        } */
-  
-        
+
+         
         console.log(scope.currentTranscriptTemplate.substr(0, scope.interim_transcript.length), scope.interim_transcript);
         scope.distance = scope.distanceFnc(scope.currentTranscriptTemplate.substr(0, scope.interim_transcript.length), scope.interim_transcript);
         scope.updateCurrentTest();
@@ -229,17 +230,10 @@ export class TestContainer implements OnInit {
             sampleRate: 44100, 
             recorderType: recordRTC.StereoAudioRecorder,
             numberOfAudioChannels: 1,
-            timeSlice: 1500,
+            timeSlice: 1000,
             desiredSampRate: 16000,
 
-            async ondataavailable(blob) {
-
-              var reader = new FileReader();
-              reader.readAsArrayBuffer(blob);
-              reader.onloadend = (event) => {
-                // The contents of the BLOB are in reader.result:
-                console.log(reader.result);
-              }
+            async ondataavailable(blob) {              
               
               let file_name =  me.currentTestId + '_' + me.currentTest;
               console.log('File name: ', file_name);
@@ -249,6 +243,7 @@ export class TestContainer implements OnInit {
               if (!me.isRecording) {
                 me.stopRecording();
               }
+
             }
         });
         me.recordAudio.startRecording();
@@ -266,6 +261,10 @@ export class TestContainer implements OnInit {
 
   stopRecording(){
     this.recordAudio.stopRecording();
+
+    this.transcript_array = {};
+    this.current_seq = 0;
+
     this.final_transcript = this.interim_transcript;
 
     let me = this;
